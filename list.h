@@ -11,16 +11,17 @@ public:
   List(const List & src);
   ~List();
 
-  void addList    (const List & src);
+  void addList(const List & src);
 
-  void push_front (int item);
-  void push_back  (int item);
+  void pushFront(int value);
+  void pushBack (int value);
 
-  int pop_front();
-  int pop_back();
+  int popFront();
+  int popBack ();
 
-  bool remove     (int value);
-  void insert     (int value);
+  bool remove(int value);
+  void insert(int value);
+
   void reverse();
 
   int & front();

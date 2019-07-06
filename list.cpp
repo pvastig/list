@@ -10,29 +10,28 @@ List::List() =default;
 
 List::List(const List & src)
 {
-    m_count = 0;
-    m_head = m_tail = nullptr;
     addList(src);
 }
 
 List::~List()
 {
     auto cur = m_head;
-    while(cur != nullptr)
+    while(cur)
     {
-        cur = cur->next;
+        Item * next = cur->next;
         delete cur;
         cur = nullptr;
+        cur = next;
     }
 }
 
 void List::addList(const List & src)
 { 
     for (auto cur = src.m_head; cur != nullptr; cur = cur->next)
-        push_back(cur->value);
+        pushBack(cur->value);
 }
 
-void List::push_front(int value)
+void List::pushFront(int value)
 {
     auto item = new Item(value, m_head);
     if (m_head == nullptr)
@@ -42,7 +41,7 @@ void List::push_front(int value)
     ++m_count;
 }
 
-void List::push_back(int value)
+void List::pushBack(int value)
 {
     auto item = new Item(value);
     if (m_tail == nullptr)
@@ -54,7 +53,7 @@ void List::push_back(int value)
     ++m_count;
 }
 
-int List::pop_front()
+int List::popFront()
 {
     if (m_count == 0)
         return 0;
@@ -65,7 +64,7 @@ int List::pop_front()
     return res;
 }
 
-int List::pop_back()
+int List::popBack()
 {
     if (m_count == 0)
         return 0;
@@ -83,7 +82,6 @@ int List::pop_back()
     return res;
 }
 
-//TODO: ломается когда пытаемся удалить найденный если он будет первый
 bool List::remove(int value)
 {
     Item * pPrev = nullptr;
@@ -143,12 +141,11 @@ void List::reverse()
     while(pCurrent != nullptr)
     {
         Item * pNext = pCurrent->next;
-        pCurrent->next = pPrev; //изменяем направление
-        //переходим к следующему элементу
+        pCurrent->next = pPrev;
         pPrev = pCurrent;
         pCurrent = pNext;
     }
-    //новый указатель на начало изменённого списка
+
     m_tail = m_head;
     m_head = pPrev;
 }
