@@ -13,7 +13,12 @@ public:
 
 private Q_SLOTS:
     void createEmptyList();
-    void insertToList();
+    void pushBack();
+    void pushFront();
+    void popFront();
+    void popBack();
+    void remove();
+    void insert();
 };
 
 TestList::TestList()
@@ -25,21 +30,90 @@ void TestList::createEmptyList()
     using namespace pa;
     List l;
     QVERIFY(l.size() == 0);
-    auto backValue = l.popBack();
-    QVERIFY(backValue == int());
-    QVERIFY(l.size() == 0);
-    auto frontValue = l.popFront();
-    QVERIFY(frontValue == int());
-    QVERIFY(l.size() == 0);
 }
 
-void TestList::insertToList()
+void TestList::pushBack()
 {
     using namespace pa;
     List l;
     l.pushBack(1);
     l.pushBack(2);
     l.pushBack(3);
+    QVERIFY(l.size() == 3);
+}
+
+void TestList::pushFront()
+{
+    using namespace pa;
+    List l;
+    l.pushFront(3);
+    l.pushFront(2);
+    l.pushFront(1);
+    QVERIFY(l.size() == 3);
+}
+
+void TestList::popFront()
+{
+    using namespace pa;
+    List l;
+    l.pushFront(3);
+    l.pushFront(2);
+    l.pushFront(1);
+    l.popFront();
+    QVERIFY(l.size() == 2);
+    l.popFront();
+    QVERIFY(l.size() == 1);
+    l.popFront();
+    QVERIFY(l.size() == 0);
+}
+
+void TestList::popBack()
+{
+    using namespace pa;
+    List l;
+    l.pushBack(1);
+    l.pushBack(2);
+    l.pushBack(3);
+    l.popFront();
+    QVERIFY(l.size() == 2);
+}
+
+void TestList::remove()
+{
+    using namespace pa;
+    {
+        List l;
+        l.pushBack(1);
+        l.pushBack(2);
+        l.pushBack(3);
+        l.remove(3);
+        QVERIFY(l.size() == 2);
+    }
+    {
+        List l;
+        l.pushBack(1);
+        l.pushBack(2);
+        l.pushBack(3);
+        l.remove(1);
+        QVERIFY(l.size() == 2);
+    }
+    {
+        List l;
+        l.pushBack(1);
+        l.pushBack(2);
+        l.pushBack(3);
+        l.remove(2);
+        QVERIFY(l.size() == 2);
+    }
+}
+
+void TestList::insert()
+{
+    using namespace pa;
+    List l;
+    l.insert(1);
+    l.insert(2);
+    l.insert(3);
     QVERIFY(l.size() == 3);
 }
 

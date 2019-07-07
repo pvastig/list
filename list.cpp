@@ -55,83 +55,79 @@ void List::pushBack(int value)
 
 int List::popFront()
 {
-    if (m_count == 0)
-        return 0;
-    int res = m_head->value;
+    int value = m_head->value;
+    auto cur = m_head;
     m_head = m_head->next;
+    delete cur;
     --m_count;
 
-    return res;
+    return value;
 }
 
 int List::popBack()
 {
-    if (m_count == 0)
-        return 0;
+    int value = m_tail->value;
+    Item * prev = nullptr;
+    for (auto * cur = m_head; cur != m_tail; cur = cur->next)
+        prev = cur;
 
-    int res = m_tail->value;
-    Item * pPrev = nullptr;
-    for (Item * pCur = m_head; pCur != m_tail; pCur = pCur->next)
-        pPrev = pCur;
-
-    pPrev->next = nullptr;
+    prev->next = nullptr;
     delete m_tail;
     --m_count;
-    m_tail = pPrev;
+    m_tail = prev;
 
-    return res;
+    return value;
 }
 
 bool List::remove(int value)
 {
-    Item * pPrev = nullptr;
-    Item * pCurrent = m_head;
-    while(pCurrent)
+    Item * prev = nullptr;
+    Item * cur  = m_head;
+    while(cur)
     {
-        if (pCurrent->value == value)
+        if (cur->value == value)
         {
-            if (nullptr == pPrev)
+            if (cur == m_head)
                 m_head = m_head->next;
-            else if (pCurrent == m_tail)
-                m_tail = pCurrent;
-            else if (pPrev)
-                pPrev->next = pCurrent->next;
+            else if (cur == m_tail)
+            {
+                m_tail = prev;
+                m_tail->next = nullptr;
+            }
+            else if (prev)
+                prev->next = cur->next;
 
-            delete pCurrent;
+            delete cur;
+            cur = nullptr;
             --m_count;
 
             return true;
         }
-        else
-        {
-            pPrev = pCurrent;
-            pCurrent = pCurrent->next;
-        }
+        prev = cur;
+        cur = cur->next;
     }
 
     return false;
 }
 
-void List::insert(const int value)
+void List::insert(int value)
 {
-    Item * pPrev = nullptr;
-    Item * pCur = m_head;
-    while (pCur != nullptr && pCur->value < value)
+    Item * prev = nullptr;
+    Item * cur = m_head;
+    while (cur && cur->value < value)
     {
-        pPrev = pCur;
-        pCur = pCur->next;
+        prev = cur;
+        cur = cur->next;
     }
 
-    auto pItem = new Item(value, pCur);
-    if (nullptr == pCur)
-        m_tail = pItem;
-
-    if (pPrev == nullptr)
-        m_head = pItem;
+    auto item = new Item(value, cur);
+    if (cur == nullptr)
+        m_tail = item;
+    if (prev == nullptr)
+        m_head = item;
     else
-        pPrev->next = pItem;
-
-    m_count++;
+        prev->next = item;
+    ++m_count;
 }
 
 void List::reverse()

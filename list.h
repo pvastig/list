@@ -33,6 +33,8 @@ public:
   size_t size() const { return m_count; }
   std::string getAllItemsInfo() const;
 
+  bool empty() const { return m_count == 0; }
+
 private:
   struct Item
   {

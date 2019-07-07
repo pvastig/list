@@ -5,9 +5,8 @@
 int main(int argc, char *argv[])
 {
     pa::List l;
-    l.pushFront(3);
-    l.pushFront(2);
-    l.pushFront(1);
-    std::cout << l.back() << " " << l.front() << std::endl;
+    l.insert(1);
+    l.insert(2);
+    l.insert(3);
     std::cout << l.getAllItemsInfo();
 }
