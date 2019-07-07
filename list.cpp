@@ -15,13 +15,13 @@ List::List(const List & src)
 
 List::~List()
 {
-    auto cur = m_head;
-    while(cur)
+    Item * next = m_head;
+    while(next)
     {
-        Item * next = cur->next;
+        Item * cur = next;
+        next = cur->next;
         delete cur;
         cur = nullptr;
-        cur = next;
     }
 }
 
