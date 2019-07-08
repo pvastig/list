@@ -6,8 +6,6 @@
 
 QT       += testlib
 
-QT       -= gui
-
 TARGET = tst_test
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -31,7 +29,3 @@ SOURCES += \
 
 SOURCES += ../list.cpp
 HEADERS += ../list.h
-
-# include the classes from the main project:
-#INCLUDEPATH += .././
-#include(stringUtils.pri)

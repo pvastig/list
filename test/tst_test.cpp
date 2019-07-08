@@ -28,14 +28,14 @@ TestList::TestList()
 void TestList::createEmptyList()
 {
     using namespace pa;
-    List l;
+    List<int> l;
     QVERIFY(l.size() == 0);
 }
 
 void TestList::pushBack()
 {
     using namespace pa;
-    List l;
+    List<int> l;
     l.pushBack(1);
     l.pushBack(2);
     l.pushBack(3);
@@ -45,7 +45,7 @@ void TestList::pushBack()
 void TestList::pushFront()
 {
     using namespace pa;
-    List l;
+    List<int> l;
     l.pushFront(3);
     l.pushFront(2);
     l.pushFront(1);
@@ -55,7 +55,7 @@ void TestList::pushFront()
 void TestList::popFront()
 {
     using namespace pa;
-    List l;
+    List<int> l;
     l.pushFront(3);
     l.pushFront(2);
     l.pushFront(1);
@@ -70,7 +70,7 @@ void TestList::popFront()
 void TestList::popBack()
 {
     using namespace pa;
-    List l;
+    List<int> l;
     l.pushBack(1);
     l.pushBack(2);
     l.pushBack(3);
@@ -82,7 +82,7 @@ void TestList::remove()
 {
     using namespace pa;
     {
-        List l;
+        List<int> l;
         l.pushBack(1);
         l.pushBack(2);
         l.pushBack(3);
@@ -90,7 +90,7 @@ void TestList::remove()
         QVERIFY(l.size() == 2);
     }
     {
-        List l;
+        List<int> l;
         l.pushBack(1);
         l.pushBack(2);
         l.pushBack(3);
@@ -98,19 +98,26 @@ void TestList::remove()
         QVERIFY(l.size() == 2);
     }
     {
-        List l;
+        List<int> l;
         l.pushBack(1);
         l.pushBack(2);
         l.pushBack(3);
         l.remove(2);
         QVERIFY(l.size() == 2);
     }
+    {
+        List<int> l;
+        l.pushBack(1);
+        l.remove(1);
+        QVERIFY(l.size() == 0);
+        QVERIFY(l.empty());
+    }
 }
 
 void TestList::insert()
 {
     using namespace pa;
-    List l;
+    List<int> l;
     l.insert(1);
     l.insert(2);
     l.insert(3);
