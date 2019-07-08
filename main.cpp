@@ -28,10 +28,7 @@ int main(int argc, char *argv[])
     }
     {
         using namespace pa;
-        pa::List<char> l;
-        l.pushFront('a');
-        l.pushFront('b');
-        l.pushFront('c');
+        pa::List<char> l{'a', 'b', 'c' };
         for (auto it : l) {
             std::cout << it << std::endl;
         }

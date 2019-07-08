@@ -1,8 +1,9 @@
 #pragma once
 
-#include <string>
+#include <initializer_list>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 namespace pa {
 
@@ -13,6 +14,7 @@ class List
     friend void swap(List<T> & l, List<T> & r) noexcept;
 public:
     List();
+    explicit List(std::initializer_list<T> args);
     List(const List & other);
     List(List && other) noexcept;
     List & operator=(List other);
@@ -71,12 +73,12 @@ struct List<T>::Item
 template<class T>
 class List<T>::iterator
 {
-    public:
-        explicit iterator(List<T>::Item * it) : m_it(it){}
-        iterator & operator++() { m_it = m_it->next; return *this; }
-        T & operator*() { return m_it->value; }
-        bool operator==(iterator const & it) { return m_it == it.m_it; }
-        bool operator!=(iterator const & it) { return m_it != it.m_it; }
+public:
+    explicit iterator(List<T>::Item * it) : m_it(it){}
+    iterator & operator++() { m_it = m_it->next; return *this; }
+    T & operator*() { return m_it->value; }
+    bool operator==(iterator const & it) { return m_it == it.m_it; }
+    bool operator!=(iterator const & it) { return m_it != it.m_it; }
 
 private:
     List<T>::Item * m_it;
@@ -96,6 +98,13 @@ template <class T>
 List<T>::List(const List & other)
 {
     addList(other);
+}
+
+template<class T>
+List<T>::List(std::initializer_list<T> args)
+{
+    for (auto const & arg : args)
+        pushBack(arg);
 }
 
 template <class T>
@@ -329,6 +338,4 @@ typename List<T>::iterator List<T>::end()
     return iterator(m_tail->next);
 }
 
-
 }// end namespace
-
