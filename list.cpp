@@ -149,19 +149,21 @@ void List::reverse()
 void List::reverseUsingRecursion()
 {
     m_tail = m_head;
-    m_head = reverse(m_head);
+    reverse(&m_head);
 }
 
-List::Item * List::reverse(Item * item)
+void List::reverse(Item ** item)
 {
     if(!item)
-        return nullptr;
-    if(!item->next)
-        return item;
-    Item * cur = reverse(item->next);
-    item->next->next = item;
-    item->next = nullptr;
-    return cur;
+        return;
+    Item * first = *item;
+    Item * rest  = first->next;
+    if(!rest)
+        return;
+    reverse(&rest);
+    first->next->next = first;
+    first->next = nullptr;
+    *item = rest;
 }
 
 int & List::front()

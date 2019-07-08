@@ -44,7 +44,7 @@ private:
         Item(int value, Item * next = nullptr) : value(value), next(next) {}
     };
 
-    Item * reverse(Item * item);
+    void reverse(Item ** item);
 
     size_t m_count = 0;
     Item * m_head = nullptr;
