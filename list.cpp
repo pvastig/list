@@ -1,16 +1,38 @@
 #include "list.h"
 
+#include <utility>
 #include <cassert>
 #include <iostream>
 #include <sstream>
 
 namespace pa {
 
+void swap(pa::List & l, pa::List & r) noexcept
+{
+    std::swap(l.m_count, r.m_count);
+    std::swap(l.m_head, r.m_head);
+    std::swap(l.m_tail, r.m_tail);
+}
+
 List::List() =default;
 
-List::List(const List & src)
+List::List(const List & other)
 {
-    addList(src);
+    addList(other);
+}
+
+List::List(List && other) : List()
+{
+    swap(*this, other);
+}
+
+List & List::operator=(List other)
+{
+    if (this == &other)
+        return *this;
+
+    swap(*this, other);
+    return *this;
 }
 
 List::~List()
@@ -149,21 +171,21 @@ void List::reverse()
 void List::reverseUsingRecursion()
 {
     m_tail = m_head;
-    reverse(&m_head);
+    reverse(m_head);
 }
 
-void List::reverse(Item ** item)
+void List::reverse(Item *& item)
 {
     if(!item)
         return;
-    Item * first = *item;
+    Item * first = item;
     Item * rest  = first->next;
     if(!rest)
         return;
-    reverse(&rest);
+    reverse(rest);
     first->next->next = first;
     first->next = nullptr;
-    *item = rest;
+    item = rest;
 }
 
 int & List::front()
@@ -201,3 +223,4 @@ std::string List::getAllItemsInfo() const
 }
 
 }//end namepace pa
+

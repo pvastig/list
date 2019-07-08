@@ -6,9 +6,12 @@ namespace pa {
 
 class List
 {
+    friend void swap(List & l, List & r) noexcept;
 public:
     List();
-    List(const List & src);
+    List(const List & other);
+    List(List && other);
+    List & operator=(List other);
     ~List();
 
     void addList(const List & src);
@@ -44,7 +47,7 @@ private:
         Item(int value, Item * next = nullptr) : value(value), next(next) {}
     };
 
-    void reverse(Item ** item);
+    void reverse(Item *& item);
 
     size_t m_count = 0;
     Item * m_head = nullptr;
@@ -52,3 +55,4 @@ private:
 };
 
 }// end namespace
+
