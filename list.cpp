@@ -18,7 +18,7 @@ List::~List()
     Item * next = m_head;
     while(next)
     {
-        Item * cur = next;
+        auto cur = next;
         next = cur->next;
         delete cur;
         cur = nullptr;
@@ -33,7 +33,7 @@ void List::addList(const List & src)
 
 void List::pushFront(int value)
 {
-    auto item = new Item(value, m_head);
+    Item * item = new Item(value, m_head);
     if (m_head == nullptr)
         m_tail = item;
 
@@ -43,7 +43,7 @@ void List::pushFront(int value)
 
 void List::pushBack(int value)
 {
-    auto item = new Item(value);
+    Item * item = new Item(value);
     if (m_tail == nullptr)
         m_head = item;
     else
@@ -68,7 +68,7 @@ int List::popBack()
 {
     int value = m_tail->value;
     Item * prev = nullptr;
-    for (auto * cur = m_head; cur != m_tail; cur = cur->next)
+    for (auto cur = m_head; cur != m_tail; cur = cur->next)
         prev = cur;
 
     prev->next = nullptr;
@@ -120,7 +120,7 @@ void List::insert(int value)
         cur = cur->next;
     }
 
-    auto item = new Item(value, cur);
+    Item * item = new Item(value, cur);
     if (cur == nullptr)
         m_tail = item;
     if (prev == nullptr)
@@ -132,18 +132,36 @@ void List::insert(int value)
 
 void List::reverse()
 {
-    Item * pCurrent = m_head;
-    Item * pPrev = nullptr;
-    while(pCurrent != nullptr)
+    Item * cur = m_head;
+    Item * prev = nullptr;
+    while(cur)
     {
-        Item * pNext = pCurrent->next;
-        pCurrent->next = pPrev;
-        pPrev = pCurrent;
-        pCurrent = pNext;
+        Item * next = cur->next;
+        cur->next = prev;
+        prev = cur;
+        cur = next;
     }
 
     m_tail = m_head;
-    m_head = pPrev;
+    m_head = prev;
+}
+
+void List::reverseUsingRecursion()
+{
+    m_tail = m_head;
+    m_head = reverse(m_head);
+}
+
+List::Item * List::reverse(Item * item)
+{
+    if(!item)
+        return nullptr;
+    if(!item->next)
+        return item;
+    Item * cur = reverse(item->next);
+    item->next->next = item;
+    item->next = nullptr;
+    return cur;
 }
 
 int & List::front()

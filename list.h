@@ -7,45 +7,48 @@ namespace pa {
 class List
 {
 public:
-  List();
-  List(const List & src);
-  ~List();
+    List();
+    List(const List & src);
+    ~List();
 
-  void addList(const List & src);
+    void addList(const List & src);
 
-  void pushFront(int value);
-  void pushBack (int value);
+    void pushFront(int value);
+    void pushBack (int value);
 
-  int popFront();
-  int popBack ();
+    int popFront();
+    int popBack ();
 
-  bool remove(int value);
-  void insert(int value);
+    bool remove(int value);
+    void insert(int value);
 
-  void reverse();
+    void reverse();
+    void reverseUsingRecursion();
 
-  int & front();
-  const int & front() const;
+    int & front();
+    const int & front() const;
 
-  int & back();
-  const int & back() const;
+    int & back();
+    const int & back() const;
 
-  size_t size() const { return m_count; }
-  std::string getAllItemsInfo() const;
+    size_t size() const { return m_count; }
+    std::string getAllItemsInfo() const;
 
-  bool empty() const { return m_count == 0; }
+    bool empty() const { return m_count == 0; }
 
 private:
-  struct Item
-  {
-    int value;
-    Item * next;
-    Item(int value, Item * next = nullptr) : value(value), next(next) {}
-  };
+    struct Item
+    {
+        int value;
+        Item * next;
+        Item(int value, Item * next = nullptr) : value(value), next(next) {}
+    };
 
-  size_t m_count = 0;
-  Item * m_head = nullptr;
-  Item * m_tail = nullptr;
+    Item * reverse(Item * item);
+
+    size_t m_count = 0;
+    Item * m_head = nullptr;
+    Item * m_tail = nullptr;
 };
 
 }// end namespace
