@@ -12,12 +12,18 @@ int main(int argc, char *argv[])
         l.reverseUsingRecursion();
         std::cout << l.front() << " " << l.back() << std::endl;
         std::cout << l.getAllItemsInfo();
+        pa::List l2;
+        l2.reverseUsingRecursion();
+        std::cout << l2.getAllItemsInfo();
     }
     {
+        using namespace pa;
         pa::List l;
         l.pushFront(1);
         l.pushFront(2);
         l.pushFront(3);
-        l.reverse();
+        for (auto it : l) {
+            std::cout << it << std::endl;
+        }
     }
 }

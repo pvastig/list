@@ -39,19 +39,31 @@ public:
 
     bool empty() const { return m_count == 0; }
 
-private:
-    struct Item
-    {
-        int value;
-        Item * next;
-        Item(int value, Item * next = nullptr) : value(value), next(next) {}
+    struct Item;
+    class iterator{
+    public:
+        explicit iterator(List::Item * it);
+        iterator & operator++();
+        int & operator*();
+        bool operator==(iterator const & it);
+        bool operator!=(iterator const & it);
+
+    private:
+        List::Item * m_it;
     };
+    iterator begin();
+    iterator end();
 
-    void reverse(Item *& item);
+    class const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
 
+private:
     size_t m_count = 0;
     Item * m_head = nullptr;
     Item * m_tail = nullptr;
+
+    void reverse(Item *& item);
 };
 
 }// end namespace

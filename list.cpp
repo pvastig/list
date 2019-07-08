@@ -7,6 +7,19 @@
 
 namespace pa {
 
+struct List::Item
+{
+    Item(int value, Item * next = nullptr) : value(value), next(next) {}
+    int value;
+    Item * next;
+};
+
+List::iterator::iterator(List::Item * it) : m_it(it) {}
+List::iterator & List::iterator::operator++() { m_it = m_it->next; return *this; }
+int & List::iterator::operator*()             { return m_it->value; }
+bool List::iterator::operator==(iterator const & it) { return m_it == it.m_it; }
+bool List::iterator::operator!=(iterator const & it) { return m_it != it.m_it; }
+
 void swap(pa::List & l, pa::List & r) noexcept
 {
     std::swap(l.m_count, r.m_count);
@@ -220,6 +233,16 @@ std::string List::getAllItemsInfo() const
     stream << std::endl;
 
     return stream.str();
+}
+
+List::iterator List::begin()
+{
+    return iterator(m_head);
+}
+
+List::iterator List::end()
+{
+    return iterator(m_tail->next);
 }
 
 }//end namepace pa
