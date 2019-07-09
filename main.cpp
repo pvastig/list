@@ -1,6 +1,7 @@
-#include <iostream>
-
 #include "list.h"
+
+#include <algorithm>
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
@@ -32,5 +33,8 @@ int main(int argc, char *argv[])
         for (auto it : l) {
             std::cout << it << std::endl;
         }
+
+        auto found = std::find(l.begin(), l.end(), 'a');
+        std::cout << *found << std::endl;
     }
 }

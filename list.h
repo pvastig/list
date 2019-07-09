@@ -74,12 +74,19 @@ template<class T>
 class List<T>::iterator
 {
 public:
-    explicit iterator(List<T>::Item * it) : m_it(it){}
-    iterator & operator++() { m_it = m_it->next; return *this; }
-    T & operator*() { return m_it->value; }
+    typedef T value_type;
+    typedef T& reference;
+    typedef T* pointer;
+    typedef std::forward_iterator_tag iterator_category;
+    typedef int difference_type;
+    iterator(iterator const & it) : m_it(it.m_it) {}
+    iterator(List<T>::Item * item) : m_it(item) {}
+    iterator operator++() { m_it = m_it->next; return *this; }
+    iterator operator++(int) { iterator tmp; m_it = m_it->next; return tmp; }
+    reference operator*() { return m_it->value; }
+    pointer operator->()  { return m_it->value; }
     bool operator==(iterator const & it) { return m_it == it.m_it; }
     bool operator!=(iterator const & it) { return m_it != it.m_it; }
-
 private:
     List<T>::Item * m_it;
 };
@@ -91,8 +98,9 @@ void swap(List<T> & l, List<T> & r) noexcept
     std::swap(l.m_head, r.m_head);
     std::swap(l.m_tail, r.m_tail);
 }
+
 template<class T>
-List<T>::List() =default;
+List<T>::List() = default;
 
 template <class T>
 List<T>::List(const List & other)
