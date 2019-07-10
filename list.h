@@ -16,12 +16,12 @@ class List
 public:
     List();
     explicit List(std::initializer_list<T> args);
-    List(const List & other);
+    List(List const & other);
     List(List && other) noexcept;
     List & operator=(List other);
     ~List();
 
-    void addList(const List & other);
+    void addList(List const & other);
 
     void pushFront(T value);
     void pushBack (T value);
@@ -36,10 +36,10 @@ public:
     void reverseUsingRecursion();
 
     T & front();
-    const T & front() const;
+    T const & front() const;
 
     T & back();
-    const T & back() const;
+    T const & back() const;
 
     size_t size() const { return m_count; }
     std::string getAllItemsInfo() const;
@@ -158,7 +158,7 @@ template<class T>
 List<T>::List() = default;
 
 template <class T>
-List<T>::List(const List & other)
+List<T>::List(List const & other)
 {
     addList(other);
 }
@@ -173,6 +173,7 @@ List<T>::List(std::initializer_list<T> args)
 template <class T>
 List<T>::List::List(List && other) noexcept : List()
 {
+    using std::swap;
     swap(*this, other);
 }
 
@@ -193,7 +194,7 @@ List<T>::~List()
     Node * next = m_head;
     while(next)
     {
-        auto cur = next;
+        Node * cur = next;
         next = cur->next;
         delete cur;
         cur = nullptr;
@@ -201,9 +202,9 @@ List<T>::~List()
 }
 
 template<class T>
-void List<T>::addList(const List & other)
+void List<T>::addList(List const & other)
 {
-    for (const auto & item : other)
+    for (auto const & item : other)
         pushBack(item->value);
 }
 
@@ -234,8 +235,8 @@ void List<T>::pushBack(T value)
 template<class T>
 T List<T>::popFront()
 {
-    int value = m_head->value;
-    auto cur = m_head;
+    T value = m_head->value;
+    Node * cur = m_head;
     m_head = m_head->next;
     delete cur;
     --m_count;
@@ -246,9 +247,9 @@ T List<T>::popFront()
 template<class T>
 T List<T>::popBack()
 {
-    int value = m_tail->value;
+    T value = m_tail->value;
     Node * prev = nullptr;
-    for (auto cur = m_head; cur != m_tail; cur = cur->next)
+    for (Node * cur = m_head; cur != m_tail; cur = cur->next)
         prev = cur;
 
     prev->next = nullptr;
@@ -358,7 +359,7 @@ T & List<T>::front()
 }
 
 template <class T>
-const T & List<T>::front() const
+T const & List<T>::front() const
 {
     return m_head->value;
 }
@@ -370,7 +371,7 @@ T & List<T>::back()
 }
 
 template<class T>
-const T & List<T>::back() const
+T const & List<T>::back() const
 {
     return m_tail->value;
 }
@@ -379,7 +380,7 @@ template<class T>
 std::string List<T>::getAllItemsInfo() const
 {
     std::stringstream stream;
-    auto cur = m_head;
+    Node * cur = m_head;
     while (cur)
     {
         stream << cur->value << ' ';
