@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cassert>
 
 namespace pa {
 
@@ -20,7 +21,7 @@ public:
     List & operator=(List other);
     ~List();
 
-    void addList(const List & src);
+    void addList(const List & other);
 
     void pushFront(T value);
     void pushBack (T value);
@@ -45,50 +46,104 @@ public:
 
     bool empty() const { return m_count == 0; }
 
-    class iterator;
+    template<class Type,
+             class UnqualifiedType = std::remove_cv_t<Type>>
+    class ForwardIterator : public std::iterator<std::forward_iterator_tag,
+                                                 UnqualifiedType,
+                                                 std::ptrdiff_t,
+                                                 Type*,
+                                                 Type&>
+    {
+        friend class List<UnqualifiedType>;
+        typename List<UnqualifiedType>::Node * m_it;
+
+        explicit ForwardIterator(typename List<UnqualifiedType>::Node * it)
+            : m_it(it)
+        {
+        }
+
+    public:
+        ForwardIterator() : m_it(nullptr)
+        {
+        }
+
+        void swap(ForwardIterator & other) noexcept
+        {
+            using std::swap;
+            swap(m_it, other.iter);
+        }
+
+        ForwardIterator& operator++()
+        {
+            assert(m_it != nullptr && "Out-of-bounds iterator increment!");
+            m_it = m_it->next;
+            return *this;
+        }
+
+        ForwardIterator operator++(int)
+        {
+            assert(m_it != nullptr && "Out-of-bounds iterator increment!");
+            ForwardIterator tmp(*this);
+            m_it = m_it->next;
+            return tmp;
+        }
+
+        // two-way comparison: v.begin() == v.cbegin() and vice versa
+        template<class OtherType>
+        bool operator==(ForwardIterator<OtherType> const & rhs) const
+        {
+            return m_it == rhs.m_it;
+        }
+
+        template<class OtherType>
+        bool operator != (ForwardIterator<OtherType> const & rhs) const
+        {
+            return m_it != rhs.m_it;
+        }
+
+        Type & operator*() const
+        {
+            assert(m_it != nullptr && "Invalid iterator dereference!");
+            return m_it->value;
+        }
+
+        Type & operator->() const
+        {
+            assert(m_it != nullptr && "Invalid iterator dereference!");
+            return m_it->value;
+        }
+
+        // One way conversion: iterator -> const_iterator
+        operator ForwardIterator<const Type>() const
+        {
+            return ForwardIterator<const Type>(m_it);
+        }
+    };
+
+    using iterator = ForwardIterator<T>;
+    using const_iterator = ForwardIterator<const T>;
+
     iterator begin();
     iterator end();
 
-    class const_iterator;
-    const_iterator begin() const;
-    const_iterator end() const;
+    const_iterator cbegin() const;
+    const_iterator cend() const;
 
 private:
     size_t m_count = 0;
-    struct Item;
-    Item * m_head = nullptr;
-    Item * m_tail = nullptr;
+    struct Node;
+    Node * m_head = nullptr;
+    Node * m_tail = nullptr;
 
-    void reverse(Item *& item);
+    void reverse(Node *& item);
 };
 
 template<class T>
-struct List<T>::Item
+struct List<T>::Node
 {
-    Item(T value, Item * next = nullptr) : value(value), next(next) {}
+    Node(T value, Node * next = nullptr) : value(value), next(next) {}
     T value;
-    Item * next;
-};
-
-template<class T>
-class List<T>::iterator
-{
-public:
-    typedef T value_type;
-    typedef T& reference;
-    typedef T* pointer;
-    typedef std::forward_iterator_tag iterator_category;
-    typedef int difference_type;
-    iterator(iterator const & it) : m_it(it.m_it) {}
-    iterator(List<T>::Item * item) : m_it(item) {}
-    iterator operator++() { m_it = m_it->next; return *this; }
-    iterator operator++(int) { iterator tmp; m_it = m_it->next; return tmp; }
-    reference operator*() { return m_it->value; }
-    pointer operator->()  { return m_it->value; }
-    bool operator==(iterator const & it) { return m_it == it.m_it; }
-    bool operator!=(iterator const & it) { return m_it != it.m_it; }
-private:
-    List<T>::Item * m_it;
+    Node * next;
 };
 
 template<class T>
@@ -124,6 +179,7 @@ List<T>::List::List(List && other) noexcept : List()
 template <class T>
 List<T> & List<T>::operator=(List other)
 {
+    using std::swap;
     if (this == &other)
         return *this;
 
@@ -134,7 +190,7 @@ List<T> & List<T>::operator=(List other)
 template<class T>
 List<T>::~List()
 {
-    Item * next = m_head;
+    Node * next = m_head;
     while(next)
     {
         auto cur = next;
@@ -145,16 +201,16 @@ List<T>::~List()
 }
 
 template<class T>
-void List<T>::addList(const List & src)
+void List<T>::addList(const List & other)
 {
-    for (auto cur = src.m_head; cur != nullptr; cur = cur->next)
-        pushBack(cur->value);
+    for (const auto & item : other)
+        pushBack(item->value);
 }
 
 template<class T>
 void List<T>::pushFront(T value)
 {
-    Item * item = new Item(value, m_head);
+    Node * item = new Node(value, m_head);
     if (m_head == nullptr)
         m_tail = item;
 
@@ -165,7 +221,7 @@ void List<T>::pushFront(T value)
 template <class T>
 void List<T>::pushBack(T value)
 {
-    Item * item = new Item(value);
+    Node * item = new Node(value);
     if (m_tail == nullptr)
         m_head = item;
     else
@@ -191,7 +247,7 @@ template<class T>
 T List<T>::popBack()
 {
     int value = m_tail->value;
-    Item * prev = nullptr;
+    Node * prev = nullptr;
     for (auto cur = m_head; cur != m_tail; cur = cur->next)
         prev = cur;
 
@@ -206,8 +262,8 @@ T List<T>::popBack()
 template<class T>
 bool List<T>::remove(T value)
 {
-    Item * prev = nullptr;
-    Item * cur  = m_head;
+    Node * prev = nullptr;
+    Node * cur  = m_head;
     while(cur)
     {
         if (cur->value == value)
@@ -238,15 +294,15 @@ bool List<T>::remove(T value)
 template<class T>
 void List<T>::insert(T value)
 {
-    Item * prev = nullptr;
-    Item * cur = m_head;
+    Node * prev = nullptr;
+    Node * cur = m_head;
     while (cur && cur->value < value)
     {
         prev = cur;
         cur = cur->next;
     }
 
-    Item * item = new Item(value, cur);
+    Node * item = new Node(value, cur);
     if (cur == nullptr)
         m_tail = item;
     if (prev == nullptr)
@@ -259,11 +315,11 @@ void List<T>::insert(T value)
 template<class T>
 void List<T>::reverse()
 {
-    Item * cur = m_head;
-    Item * prev = nullptr;
+    Node * cur = m_head;
+    Node * prev = nullptr;
     while(cur)
     {
-        Item * next = cur->next;
+        Node * next = cur->next;
         cur->next = prev;
         prev = cur;
         cur = next;
@@ -281,12 +337,12 @@ void List<T>::reverseUsingRecursion()
 }
 
 template<class T>
-void List<T>::reverse(Item *& item)
+void List<T>::reverse(Node *& item)
 {
     if(!item)
         return;
-    Item * first = item;
-    Item * rest  = first->next;
+    Node * first = item;
+    Node * rest  = first->next;
     if(!rest)
         return;
     reverse(rest);
@@ -344,6 +400,18 @@ template<class T>
 typename List<T>::iterator List<T>::end()
 {
     return iterator(m_tail->next);
+}
+
+template<class T>
+typename List<T>::const_iterator List<T>::cbegin() const
+{
+    return const_iterator(begin());
+}
+
+template<class T>
+typename List<T>::const_iterator List<T>::cend() const
+{
+    return const_iterator(end());
 }
 
 }// end namespace

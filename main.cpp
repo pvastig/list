@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-int main(int argc, char *argv[])
+int main(int, char **)
 {
     {
         pa::List<int> l;
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         l.pushFront(1.2);
         l.pushFront(2.5);
         l.pushFront(3.6);
-        for (auto it : l) {
+        for (const auto & it : l) {
             std::cout << it << std::endl;
         }
     }
