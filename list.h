@@ -1,10 +1,11 @@
 #pragma once
 
+#include <cassert>
 #include <initializer_list>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <cassert>
+#include <utility>
 
 namespace pa {
 
@@ -42,7 +43,6 @@ public:
     T const & back() const;
 
     size_t size() const { return m_count; }
-    std::string getAllItemsInfo() const;
 
     bool empty() const { return m_count == 0; }
 
@@ -126,8 +126,13 @@ public:
     iterator begin();
     iterator end();
 
-    const_iterator cbegin() const;
-    const_iterator cend() const;
+    const_iterator begin() const;
+    const_iterator end() const;
+
+    bool erase(iterator it);
+    void clear() noexcept;
+
+    std::string getAllItemsInfo() const;
 
 private:
     size_t m_count = 0;
@@ -191,6 +196,8 @@ List<T> & List<T>::operator=(List other)
 template<class T>
 List<T>::~List()
 {
+    if (empty())
+        return;
     Node * next = m_head;
     while(next)
     {
@@ -199,6 +206,7 @@ List<T>::~List()
         delete cur;
         cur = nullptr;
     }
+    m_count = 0;
 }
 
 template<class T>
@@ -379,13 +387,11 @@ T const & List<T>::back() const
 template<class T>
 std::string List<T>::getAllItemsInfo() const
 {
+    if (empty())
+        return std::string();
     std::stringstream stream;
-    Node * cur = m_head;
-    while (cur)
-    {
-        stream << cur->value << ' ';
-        cur = cur->next;
-    }
+    for (auto & it : *this)
+        stream << it << ' ';
     stream << std::endl;
 
     return stream.str();
@@ -400,19 +406,34 @@ typename List<T>::iterator List<T>::begin()
 template<class T>
 typename List<T>::iterator List<T>::end()
 {
-    return iterator(m_tail->next);
+    return iterator(nullptr);
 }
 
 template<class T>
-typename List<T>::const_iterator List<T>::cbegin() const
+typename List<T>::const_iterator List<T>::begin() const
 {
-    return const_iterator(begin());
+    return const_iterator(m_head);
 }
 
 template<class T>
-typename List<T>::const_iterator List<T>::cend() const
+typename List<T>::const_iterator List<T>::end() const
 {
-    return const_iterator(end());
+    return const_iterator(nullptr);
+}
+
+//TODO: rewrite using iterators
+template<class T>
+bool List<T>::erase(iterator it)
+{
+    return remove(*it);
+}
+
+//TODO: improve clear
+template<class T>
+void List<T>::clear() noexcept
+{
+    List<T> tmp;
+    //swap(tmp);
 }
 
 }// end namespace
