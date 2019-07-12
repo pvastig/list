@@ -35,10 +35,7 @@ void TestList::createEmptyList()
 void TestList::pushBack()
 {
     using namespace pa;
-    List<int> l;
-    l.pushBack(1);
-    l.pushBack(2);
-    l.pushBack(3);
+    List<int> l {1, 2, 3};
     QVERIFY(l.size() == 3);
 }
 
@@ -50,6 +47,9 @@ void TestList::pushFront()
     l.pushFront(2);
     l.pushFront(1);
     QVERIFY(l.size() == 3);
+    int i = 1;
+    for (auto const & item : l)
+        QVERIFY(item == i++);
 }
 
 void TestList::popFront()
@@ -70,45 +70,50 @@ void TestList::popFront()
 void TestList::popBack()
 {
     using namespace pa;
-    List<int> l;
-    l.pushBack(1);
-    l.pushBack(2);
-    l.pushBack(3);
-    l.popFront();
+    List<int> l {1, 2, 3};
+    l.popBack();
     QVERIFY(l.size() == 2);
+    int i = 1;
+    for (auto const & item : l)
+        QVERIFY(item == i++);
 }
 
 void TestList::remove()
 {
     using namespace pa;
     {
-        List<int> l;
-        l.pushBack(1);
-        l.pushBack(2);
-        l.pushBack(3);
-        l.remove(3);
+        List<int> l {1, 2, 3};
+        QVERIFY(l.remove(3) == true);
         QVERIFY(l.size() == 2);
+        int i = 1;
+        for (auto const & item : l)
+            QVERIFY(item == i++);
+    }
+    {
+        List<int> l {1, 2, 3};
+        QVERIFY(l.remove(1) == true);
+        QVERIFY(l.size() == 2);
+        int i = 2;
+        for (auto const & item : l)
+            QVERIFY(item == i++);
+    }
+    {
+        List<int> l {1, 2, 3};
+        QVERIFY(l.remove(2) == true);
+        QVERIFY(l.size() == 2);
+        QVERIFY(l.front() == 1);
+        QVERIFY(l.back() == 3);
     }
     {
         List<int> l;
         l.pushBack(1);
-        l.pushBack(2);
-        l.pushBack(3);
-        l.remove(1);
-        QVERIFY(l.size() == 2);
+        QVERIFY(l.remove(1) == true);
+        QVERIFY(l.size() == 0);
+        QVERIFY(l.empty());
     }
     {
         List<int> l;
-        l.pushBack(1);
-        l.pushBack(2);
-        l.pushBack(3);
-        l.remove(2);
-        QVERIFY(l.size() == 2);
-    }
-    {
-        List<int> l;
-        l.pushBack(1);
-        l.remove(1);
+        QVERIFY(l.remove(1) == false);
         QVERIFY(l.size() == 0);
         QVERIFY(l.empty());
     }
