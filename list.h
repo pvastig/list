@@ -129,8 +129,11 @@ public:
     const_iterator begin() const;
     const_iterator end() const;
 
+    const_iterator cbegin() const;
+    const_iterator cend() const;
+
     bool erase(iterator it);
-    void clear() noexcept;
+    void clear();
 
     std::string getAllItemsInfo() const;
 
@@ -196,17 +199,7 @@ List<T> & List<T>::operator=(List other)
 template<class T>
 List<T>::~List()
 {
-    if (empty())
-        return;
-    Node * next = m_head;
-    while(next)
-    {
-        Node * cur = next;
-        next = cur->next;
-        delete cur;
-        cur = nullptr;
-    }
-    m_count = 0;
+    clear();
 }
 
 template<class T>
@@ -247,6 +240,8 @@ T List<T>::popFront()
     Node * cur = m_head;
     m_head = m_head->next;
     delete cur;
+    if (m_count == 1)
+        m_tail = nullptr;
     --m_count;
 
     return value;
@@ -260,7 +255,10 @@ T List<T>::popBack()
     for (Node * cur = m_head; cur != m_tail; cur = cur->next)
         prev = cur;
 
-    prev->next = nullptr;
+    if (m_count == 1)
+        m_head = prev;
+    else
+        prev->next = nullptr;
     delete m_tail;
     --m_count;
     m_tail = prev;
@@ -421,6 +419,18 @@ typename List<T>::const_iterator List<T>::end() const
     return const_iterator(nullptr);
 }
 
+template<class T>
+typename List<T>::const_iterator List<T>::cbegin() const
+{
+    return const_iterator(m_head);
+}
+
+template<class T>
+typename List<T>::const_iterator List<T>::cend() const
+{
+    return const_iterator(nullptr);
+}
+
 //TODO: rewrite using iterators
 template<class T>
 bool List<T>::erase(iterator it)
@@ -428,12 +438,21 @@ bool List<T>::erase(iterator it)
     return remove(*it);
 }
 
-//TODO: improve clear
+//TODO: improve clear using iterators
 template<class T>
-void List<T>::clear() noexcept
+void List<T>::clear()
 {
-    List<T> tmp;
-    //swap(tmp);
+    Node * next = m_head;
+    while(next)
+    {
+        Node * cur = next;
+        next = cur->next;
+        delete cur;
+        cur = nullptr;
+        --m_count;
+    }
+    m_tail = m_head = nullptr;
+    assert(m_count >= 0);
 }
 
 }// end namespace
