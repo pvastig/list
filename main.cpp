@@ -12,10 +12,10 @@ int main(int, char **)
         l.insert(3);
         l.reverseUsingRecursion();
         std::cout << l.front() << " " << l.back() << std::endl;
-        std::cout << l.getAllItemsInfo();
+        std::cout << l;
         pa::List<int> l2;
         l2.reverseUsingRecursion();
-        std::cout << l2.getAllItemsInfo();
+        std::cout << l2;
     }
     {
         using namespace pa;
@@ -29,7 +29,7 @@ int main(int, char **)
     }
     {
         using namespace pa;
-        pa::List<char> l{'a', 'b', 'c' };
+        pa::List l{'a', 'b', 'c' };
         for (auto it : l) {
             std::cout << it << std::endl;
         }

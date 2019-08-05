@@ -70,7 +70,7 @@ void TestList::popFront()
 void TestList::popBack()
 {
     using namespace pa;
-    List<int> l {1, 2, 3};
+    List l {1, 2, 3};
     l.popBack();
     QVERIFY(l.size() == 2);
     int i = 1;
@@ -82,7 +82,7 @@ void TestList::remove()
 {
     using namespace pa;
     {
-        List<int> l {1, 2, 3};
+        List l {1, 2, 3};
         QVERIFY(l.remove(3) == true);
         QVERIFY(l.size() == 2);
         int i = 1;
@@ -90,7 +90,7 @@ void TestList::remove()
             QVERIFY(item == i++);
     }
     {
-        List<int> l {1, 2, 3};
+        List l {1, 2, 3};
         QVERIFY(l.remove(1) == true);
         QVERIFY(l.size() == 2);
         int i = 2;
@@ -98,7 +98,7 @@ void TestList::remove()
             QVERIFY(item == i++);
     }
     {
-        List<int> l {1, 2, 3};
+        List l {1, 2, 3};
         QVERIFY(l.remove(2) == true);
         QVERIFY(l.size() == 2);
         QVERIFY(l.front() == 1);

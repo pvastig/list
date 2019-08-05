@@ -10,10 +10,20 @@
 namespace pa {
 
 template<class T>
+class List;
+
+template<class T>
+void swap(List<T> &, List<T> &) noexcept;
+
+template <class T>
+std::ostream & operator<<(std::ostream &, List<T> const &);
+
+template<class T>
 class List
 {
-    template<T const &> //TODO: issue https://stackoverflow.com/questions/2183087/why-cant-i-use-float-value-as-a-template-parameter
-    friend void swap(List<T> & l, List<T> & r) noexcept;
+    friend void swap<>(List & left, List & right) noexcept;
+    friend std::ostream & operator<< <>(std::ostream & os, List const & list);
+
 public:
     List();
     explicit List(std::initializer_list<T> args);
@@ -24,8 +34,11 @@ public:
 
     void addList(List const & other);
 
+    //TODO: T const& value?
     void pushFront(T value);
+    //TODO: implement emplaceFront(T value);
     void pushBack (T value);
+    //TODO: implement void emplaceBack(T value);
 
     T popFront();
     T popBack ();
@@ -34,6 +47,7 @@ public:
     void insert(T value);
 
     void reverse();
+    //TODO: rename method
     void reverseUsingRecursion();
 
     T & front();
@@ -135,8 +149,6 @@ public:
     bool erase(iterator it);
     void clear();
 
-    std::string getAllItemsInfo() const;
-
 private:
     size_t m_count = 0;
     struct Node;
@@ -144,6 +156,7 @@ private:
     Node * m_tail = nullptr;
 
     void reverse(Node *& item);
+    std::string printItems() const;
 };
 
 template<class T>
@@ -155,11 +168,17 @@ struct List<T>::Node
 };
 
 template<class T>
-void swap(List<T> & l, List<T> & r) noexcept
+void swap(List<T> & left, List<T> & right) noexcept
 {
-    std::swap(l.m_count, r.m_count);
-    std::swap(l.m_head, r.m_head);
-    std::swap(l.m_tail, r.m_tail);
+    std::swap(left.m_count, right.m_count);
+    std::swap(left.m_head, right.m_head);
+    std::swap(left.m_tail, right.m_tail);
+}
+
+template<class T>
+std::ostream & operator<<(std::ostream & os, List<T> const & list)
+{
+    return os << list.printItems();
 }
 
 template<class T>
@@ -179,7 +198,7 @@ List<T>::List(std::initializer_list<T> args)
 }
 
 template <class T>
-List<T>::List::List(List && other) noexcept : List()
+List<T>::List(List && other) noexcept : List()
 {
     using std::swap;
     swap(*this, other);
@@ -236,6 +255,7 @@ void List<T>::pushBack(T value)
 template<class T>
 T List<T>::popFront()
 {
+    assert(!empty());
     T value = m_head->value;
     Node * cur = m_head;
     m_head = m_head->next;
@@ -250,6 +270,7 @@ T List<T>::popFront()
 template<class T>
 T List<T>::popBack()
 {
+    assert(!empty());
     T value = m_tail->value;
     Node * prev = nullptr;
     for (Node * cur = m_head; cur != m_tail; cur = cur->next)
@@ -383,12 +404,12 @@ T const & List<T>::back() const
 }
 
 template<class T>
-std::string List<T>::getAllItemsInfo() const
+std::string List<T>::printItems() const
 {
     if (empty())
         return std::string();
     std::stringstream stream;
-    for (auto & it : *this)
+    for (auto const & it : *this)
         stream << it << ' ';
     stream << std::endl;
 
