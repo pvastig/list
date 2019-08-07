@@ -27,6 +27,7 @@ class List
 public:
     List();
     explicit List(std::initializer_list<T> args);
+    explicit List(T value);
     List(List const & other);
     List(List && other) noexcept;
     List & operator=(List other);
@@ -183,6 +184,11 @@ std::ostream & operator<<(std::ostream & os, List<T> const & list)
 
 template<class T>
 List<T>::List() = default;
+
+template<class T>
+List<T>::List(T value) : List({value})
+{
+}
 
 template <class T>
 List<T>::List(List const & other)
