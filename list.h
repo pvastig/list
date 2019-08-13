@@ -12,16 +12,13 @@ namespace pa {
 template<class T>
 class List;
 
-template<class T>
-void swap(List<T> &, List<T> &) noexcept;
-
 template <class T>
 std::ostream & operator<<(std::ostream &, List<T> const &);
 
 template<class T>
 class List
 {
-    friend void swap<>(List & left, List & right) noexcept;
+    void swap(List & other) noexcept;
     friend std::ostream & operator<< <>(std::ostream & os, List const & list);
 
 public:
@@ -169,11 +166,11 @@ struct List<T>::Node
 };
 
 template<class T>
-void swap(List<T> & left, List<T> & right) noexcept
+void List<T>::swap(List & other) noexcept
 {
-    std::swap(left.m_count, right.m_count);
-    std::swap(left.m_head, right.m_head);
-    std::swap(left.m_tail, right.m_tail);
+    std::swap(m_count, other.m_count);
+    std::swap(m_head, other.m_head);
+    std::swap(m_tail, other.m_tail);
 }
 
 template<class T>
