@@ -13,21 +13,20 @@ template<class T>
 class List;
 
 template <class T>
-std::ostream & operator<<(std::ostream &, List<T> const &);
+std::ostream& operator<<(std::ostream &, List<T> const&);
 
 template<class T>
 class List
 {
-    void swap(List & other) noexcept;
-    friend std::ostream & operator<< <>(std::ostream & os, List const & list);
+    friend std::ostream& operator<< <T>(std::ostream& os, List const& list);
 
 public:
     List();
     explicit List(std::initializer_list<T> args);
     explicit List(T value);
-    List(List const & other);
-    List(List && other) noexcept;
-    List & operator=(List other);
+    List(const List& other);
+    List(List&& other) noexcept;
+    List& operator=(List other);
     ~List();
 
     void addList(List const & other);
@@ -48,125 +47,42 @@ public:
     //TODO: rename method
     void reverseUsingRecursion();
 
-    T & front();
-    T const & front() const;
+    T& front();
+    T const& front() const;
 
-    T & back();
-    T const & back() const;
+    T& back();
+    T const& back() const;
 
     size_t size() const { return m_count; }
 
     bool empty() const { return m_count == 0; }
 
-    template<class Type,
-             class UnqualifiedType = std::remove_cv_t<Type>>
-    class ForwardIterator : public std::iterator<std::forward_iterator_tag,
-                                                 UnqualifiedType,
-                                                 std::ptrdiff_t,
-                                                 Type*,
-                                                 Type&>
-    {
-        friend class List<UnqualifiedType>;
-        typename List<UnqualifiedType>::Node * m_it;
-
-        explicit ForwardIterator(typename List<UnqualifiedType>::Node * it)
-            : m_it(it)
-        {
-        }
-
-    public:
-        ForwardIterator() : m_it(nullptr)
-        {
-        }
-
-        void swap(ForwardIterator & other) noexcept
-        {
-            using std::swap;
-            swap(m_it, other.iter);
-        }
-
-        ForwardIterator& operator++()
-        {
-            assert(m_it != nullptr && "Out-of-bounds iterator increment!");
-            m_it = m_it->next;
-            return *this;
-        }
-
-        ForwardIterator operator++(int)
-        {
-            assert(m_it != nullptr && "Out-of-bounds iterator increment!");
-            ForwardIterator tmp(*this);
-            m_it = m_it->next;
-            return tmp;
-        }
-
-        // two-way comparison: v.begin() == v.cbegin() and vice versa
-        template<class OtherType>
-        bool operator==(ForwardIterator<OtherType> const & rhs) const
-        {
-            return m_it == rhs.m_it;
-        }
-
-        template<class OtherType>
-        bool operator != (ForwardIterator<OtherType> const & rhs) const
-        {
-            return m_it != rhs.m_it;
-        }
-
-        Type & operator*() const
-        {
-            assert(m_it != nullptr && "Invalid iterator dereference!");
-            return m_it->value;
-        }
-
-        Type & operator->() const
-        {
-            assert(m_it != nullptr && "Invalid iterator dereference!");
-            return m_it->value;
-        }
-
-        // One way conversion: iterator -> const_iterator
-        operator ForwardIterator<const Type>() const
-        {
-            return ForwardIterator<const Type>(m_it);
-        }
-    };
-
-    using iterator = ForwardIterator<T>;
-    using const_iterator = ForwardIterator<const T>;
-
-    iterator begin();
-    iterator end();
-
-    const_iterator begin() const;
-    const_iterator end() const;
-
-    const_iterator cbegin() const;
-    const_iterator cend() const;
-
-    bool erase(iterator it);
+    //bool erase(iterator it);
     void clear();
 
 private:
-    size_t m_count = 0;
-    struct Node;
-    Node * m_head = nullptr;
-    Node * m_tail = nullptr;
+    void swap(List& other) noexcept;
 
-    void reverse(Node *& item);
+    size_t m_count = 0;
+
+	struct Node;
+    Node* m_head = nullptr;
+    Node* m_tail = nullptr;
+
+    void reverse(Node*& item);
     std::string printItems() const;
 };
 
 template<class T>
 struct List<T>::Node
 {
-    Node(T value, Node * next = nullptr) : value(value), next(next) {}
+    Node(T value, Node* next = nullptr) : value(value), next(next) {}
     T value;
-    Node * next;
+    Node* next;
 };
 
 template<class T>
-void List<T>::swap(List & other) noexcept
+void List<T>::swap(List& other) noexcept
 {
     std::swap(m_count, other.m_count);
     std::swap(m_head, other.m_head);
@@ -174,7 +90,7 @@ void List<T>::swap(List & other) noexcept
 }
 
 template<class T>
-std::ostream & operator<<(std::ostream & os, List<T> const & list)
+std::ostream& operator<<(std::ostream& os, List<T> const& list)
 {
     return os << list.printItems();
 }
@@ -188,7 +104,7 @@ List<T>::List(T value) : List({value})
 }
 
 template <class T>
-List<T>::List(List const & other)
+List<T>::List(List const& other)
 {
     addList(other);
 }
@@ -196,23 +112,25 @@ List<T>::List(List const & other)
 template<class T>
 List<T>::List(std::initializer_list<T> args)
 {
-    for (auto const & arg : args)
+    for (auto const& arg : args)
+    {
         pushBack(arg);
+    }
 }
 
 template <class T>
-List<T>::List(List && other) noexcept : List()
+List<T>::List(List&& other) noexcept : List()
 {
-    using std::swap;
     swap(*this, other);
 }
 
 template <class T>
-List<T> & List<T>::operator=(List other)
+List<T>& List<T>::operator=(List other)
 {
-    using std::swap;
     if (this == &other)
+    {
         return *this;
+    }
 
     swap(*this, other);
     return *this;
@@ -225,18 +143,22 @@ List<T>::~List()
 }
 
 template<class T>
-void List<T>::addList(List const & other)
+void List<T>::addList(List const& other)
 {
-    for (auto const & item : other)
+    for (auto const& item : other)
+    {
         pushBack(item->value);
+    }
 }
 
 template<class T>
 void List<T>::pushFront(T value)
 {
-    Node * item = new Node(value, m_head);
+    Node* item = new Node(value, m_head);
     if (m_head == nullptr)
+    {
         m_tail = item;
+    }
 
     m_head = item;
     ++m_count;
@@ -245,11 +167,15 @@ void List<T>::pushFront(T value)
 template <class T>
 void List<T>::pushBack(T value)
 {
-    Node * item = new Node(value);
+    Node* item = new Node(value);
     if (m_tail == nullptr)
+    {
         m_head = item;
+    }
     else
+    {
         m_tail->next = item;
+    }
 
     m_tail = item;
     ++m_count;
@@ -259,12 +185,15 @@ template<class T>
 T List<T>::popFront()
 {
     assert(!empty());
-    T value = m_head->value;
-    Node * cur = m_head;
-    m_head = m_head->next;
+    auto value = m_head->value;
+    Node* cur = m_head;
+	m_head = m_head->next;
     delete cur;
+
     if (m_count == 1)
+    {
         m_tail = nullptr;
+    }
     --m_count;
 
     return value;
@@ -274,7 +203,7 @@ template<class T>
 T List<T>::popBack()
 {
     assert(!empty());
-    T value = m_tail->value;
+    auto value = m_tail->value;
     Node * prev = nullptr;
     for (Node * cur = m_head; cur != m_tail; cur = cur->next)
         prev = cur;
@@ -419,49 +348,6 @@ std::string List<T>::printItems() const
     return stream.str();
 }
 
-template<class T>
-typename List<T>::iterator List<T>::begin()
-{
-    return iterator(m_head);
-}
-
-template<class T>
-typename List<T>::iterator List<T>::end()
-{
-    return iterator(nullptr);
-}
-
-template<class T>
-typename List<T>::const_iterator List<T>::begin() const
-{
-    return const_iterator(m_head);
-}
-
-template<class T>
-typename List<T>::const_iterator List<T>::end() const
-{
-    return const_iterator(nullptr);
-}
-
-template<class T>
-typename List<T>::const_iterator List<T>::cbegin() const
-{
-    return const_iterator(m_head);
-}
-
-template<class T>
-typename List<T>::const_iterator List<T>::cend() const
-{
-    return const_iterator(nullptr);
-}
-
-//TODO: rewrite using iterators
-template<class T>
-bool List<T>::erase(iterator it)
-{
-    return remove(*it);
-}
-
 //TODO: improve clear using iterators
 template<class T>
 void List<T>::clear()
@@ -476,7 +362,7 @@ void List<T>::clear()
         --m_count;
     }
     m_tail = m_head = nullptr;
-    assert(m_count >= 0);
+    assert(m_count == 0);
 }
 
 }// end namespace
