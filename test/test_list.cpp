@@ -1,5 +1,4 @@
 #include "list.h"
-#include <ranges>
 
 #include <gtest/gtest.h>
 
@@ -11,13 +10,19 @@ class TestList : public ::testing::Test
 TEST_F(TestList, createEmptyList)
 {
     const pa::List<int> l;
-    ASSERT_TRUE(l.size() == 0);
+    ASSERT_EQ(l.size(), 0);
     ASSERT_TRUE(l.empty());
+}
+
+TEST_F(TestList, createListUsingInitializerList)
+{
+    const pa::List l{ 1, 2, 3, 4, 5 };
+    ASSERT_TRUE(l.size() == 5);
+    ASSERT_TRUE(!l.empty());
 }
 
 TEST_F(TestList, pushBack)
 {
-
 	pa::List<int> l;
 	for (const auto i : { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
 	{
@@ -28,132 +33,92 @@ TEST_F(TestList, pushBack)
     // Todo add comparing using operator ==
 }
 
-/*class TestList : public QObject
+TEST_F(TestList, pushFront)
 {
-    Q_OBJECT
-
-public:
-    TestList();
-
-private Q_SLOTS:
-    void createEmptyList();
-    void pushBack();
-    void pushFront();
-    void popFront();
-    void popBack();
-    void remove();
-    void insert();
-};
-
-TestList::TestList()
-{
+    pa::List<int> l;
+    for (const auto i : { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
+    {
+        l.pushFront(i);
+    }
+    ASSERT_EQ(l.size(), 10);
 }
 
-void TestList::createEmptyList()
+TEST_F(TestList, popFront)
 {
-    using namespace pa;
-    List<int> l;
-    QVERIFY(l.size() == 0);
+    pa::List l { 1, 2, 3 };
+    ASSERT_EQ(l.size(), 3);
+	ASSERT_FALSE(l.empty());
+
+    ASSERT_EQ(1, l.popFront());
+    ASSERT_EQ(l.size(), 2);
+
+    ASSERT_EQ(2, l.popFront());
+    ASSERT_EQ(l.size(), 1);
+
+    ASSERT_EQ(3, l.popFront());
+    ASSERT_TRUE(l.empty());
 }
 
-void TestList::pushBack()
+TEST_F(TestList, popBack)
 {
-    using namespace pa;
-    List<int> l {1, 2, 3};
-    QVERIFY(l.size() == 3);
+    pa::List l{ 1, 2, 3 };
+    ASSERT_EQ(l.size(), 3);
+    ASSERT_FALSE(l.empty());
+
+    ASSERT_EQ(3, l.popBack());
+    ASSERT_EQ(l.size(), 2);
+
+    ASSERT_EQ(2, l.popBack());
+    ASSERT_EQ(l.size(), 1);
+
+    ASSERT_EQ(1, l.popBack());
+    ASSERT_TRUE(l.empty());
 }
 
-void TestList::pushFront()
-{
-    using namespace pa;
-    List<int> l;
-    l.pushFront(3);
-    l.pushFront(2);
-    l.pushFront(1);
-    QVERIFY(l.size() == 3);
-    int i = 1;
-    for (auto const & item : l)
-        QVERIFY(item == i++);
-}
-
-void TestList::popFront()
-{
-    using namespace pa;
-    List<int> l;
-    l.pushFront(3);
-    l.pushFront(2);
-    l.pushFront(1);
-    l.popFront();
-    QVERIFY(l.size() == 2);
-    l.popFront();
-    QVERIFY(l.size() == 1);
-    l.popFront();
-    QVERIFY(l.size() == 0);
-}
-
-void TestList::popBack()
-{
-    using namespace pa;
-    List l {1, 2, 3};
-    l.popBack();
-    QVERIFY(l.size() == 2);
-    int i = 1;
-    for (auto const & item : l)
-        QVERIFY(item == i++);
-}
-
-void TestList::remove()
+TEST_F(TestList, remove)
 {
     using namespace pa;
     {
-        List l {1, 2, 3};
-        QVERIFY(l.remove(3) == true);
-        QVERIFY(l.size() == 2);
-        int i = 1;
-        for (auto const & item : l)
-            QVERIFY(item == i++);
+        List l{ 1, 2, 3 };
+        ASSERT_TRUE(l.remove(3));
+        ASSERT_EQ(l.size(), 2);
     }
     {
-        List l {1, 2, 3};
-        QVERIFY(l.remove(1) == true);
-        QVERIFY(l.size() == 2);
-        int i = 2;
-        for (auto const & item : l)
-            QVERIFY(item == i++);
+        List l{ 1, 2, 3 };
+        ASSERT_TRUE(l.remove(1) == true);
+        ASSERT_EQ(l.size(), 2);
+
+        ASSERT_FALSE(l.remove(10));
+        ASSERT_EQ(l.size(), 2);
     }
     {
-        List l {1, 2, 3};
-        QVERIFY(l.remove(2) == true);
-        QVERIFY(l.size() == 2);
-        QVERIFY(l.front() == 1);
-        QVERIFY(l.back() == 3);
+        List l{ 1, 2, 3 };
+        ASSERT_TRUE(l.remove(2));
+        ASSERT_EQ(l.size(), 2);
+        ASSERT_EQ(l.front(), 1);
+        ASSERT_EQ(l.back(), 3);
     }
     {
         List<int> l;
         l.pushBack(1);
-        QVERIFY(l.remove(1) == true);
-        QVERIFY(l.size() == 0);
-        QVERIFY(l.empty());
+        ASSERT_TRUE(l.remove(1) == true);
+        ASSERT_EQ(l.size(), 0);
     }
     {
         List<int> l;
-        QVERIFY(l.remove(1) == false);
-        QVERIFY(l.size() == 0);
-        QVERIFY(l.empty());
+        ASSERT_FALSE(l.remove(1));
+        ASSERT_EQ(l.size(), 0);
+        ASSERT_TRUE(l.empty());
     }
 }
 
-void TestList::insert()
+TEST_F(TestList, insert)
 {
     using namespace pa;
     List<int> l;
-    l.insert(1);
-    l.insert(2);
-    l.insert(3);
-    QVERIFY(l.size() == 3);
+    for (const auto i : { 1, 2, 3 })
+    {
+        l.insert(3);
+    }
+    ASSERT_EQ(3, l.size());
 }
-
-QTEST_MAIN(TestList)
-
-#include "tst_test.moc"
-*/
